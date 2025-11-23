@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dating App - TP NestJS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info.hidden {
+            display: none;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .form-section h2 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .interests-input {
+            font-size: 14px;
+        }
+
+        .interests-input::placeholder {
+            color: #999;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .profiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .profile-name {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .profile-username {
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .profile-age {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .profile-bio {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .profile-interests {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .interest-tag {
+            background: #f0f0f0;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            color: #667eea;
+        }
+
+        .profile-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .likes-count {
+            color: #e74c3c;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .like-btn {
+            background: #e74c3c;
+            padding: 8px 20px;
+            font-size: 0.9em;
+        }
+
+        .like-btn:hover {
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .like-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+            padding: 40px;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c62828;
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: white;
+            color: #333;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            font-weight: 700;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        #notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 400px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-content {
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .notification-error {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #c62828;
+        }
+
+        .notification-close {
+            margin-left: auto;
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.7;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💘 Dating App - TP NestJS</h1>
+
+        <!-- Messages de notification -->
+        <div id="notification" style="display: none;"></div>
+
+        <!-- Info utilisateur connecté -->
+        <div id="userInfo" class="user-info hidden">
+            <span>Connecté en tant que : <strong id="currentUsername"></strong> (<span id="currentName"></span>)</span>
+            <button class="btn-secondary" onclick="logout()">Déconnexion</button>
+        </div>
+
+        <!-- Tabs pour Inscription / Connexion -->
+        <div class="form-section" id="authSection">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('register')">Inscription</button>
+                <button class="tab-btn" onclick="switchTab('login')">Connexion</button>
+            </div>
+
+            <!-- Formulaire d'inscription -->
+            <div id="registerTab" class="tab-content active">
+                <h2>Créer un compte</h2>
+                <div id="authMessage"></div>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="regUsername">Username * (unique, min 3 caractères)</label>
+                        <input type="text" id="regUsername" name="username" required minlength="3" placeholder="Ex: alice_dev">
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Mot de passe * (min 6 caractères)</label>
+                        <input type="password" id="regPassword" name="password" required minlength="6" placeholder="Votre mot de passe">
+                    </div>
+                    <div class="form-group">
+                        <label for="regName">Nom *</label>
+                        <input type="text" id="regName" name="name" required minlength="2" placeholder="Ex: Alice">
+                    </div>
+                    <div class="form-group">
+                        <label for="regAge">Âge *</label>
+                        <input type="number" id="regAge" name="age" required min="18" max="99" placeholder="Ex: 25">
+                    </div>
+                    <div class="form-group">
+                        <label for="regBio">Bio</label>
+                        <textarea id="regBio" name="bio" placeholder="Décris-toi en quelques mots..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="regInterests">Centres d'intérêt (séparés par des virgules)</label>
+                        <input type="text" id="regInterests" name="interests" class="interests-input" placeholder="Ex: tech, musique, sport">
+                    </div>
+                    <button type="submit">Créer mon profil</button>
+                </form>
+            </div>
+
+            <!-- Formulaire de connexion -->
+            <div id="loginTab" class="tab-content">
+                <h2>Se connecter</h2>
+                <div id="loginMessage"></div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginUsername">Username *</label>
+                        <input type="text" id="loginUsername" name="username" required minlength="3" placeholder="Votre username">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Mot de passe *</label>
+                        <input type="password" id="loginPassword" name="password" required minlength="6" placeholder="Votre mot de passe">
+                    </div>
+                    <button type="submit">Se connecter</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Section profils -->
+        <div class="form-section">
+            <h2>Profils disponibles</h2>
+            <div id="profilesContainer">
+                <div class="loading">Chargement des profils...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+        const SESSION_KEY = 'dating_app_session';
+
+        // Charger la session au démarrage
+        let currentSession = null;
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSession();
+            loadProfiles();
+        });
+
+        // Gestion des tabs
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (tab === 'register') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('registerTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('loginTab').classList.add('active');
+            }
+        }
+
+        // Charger la session depuis localStorage
+        function loadSession() {
+            const sessionStr = localStorage.getItem(SESSION_KEY);
+            if (sessionStr) {
+                currentSession = JSON.parse(sessionStr);
+                updateUI();
+            }
+        }
+
+        // Sauvegarder la session
+        function saveSession(session) {
+            currentSession = session;
+            localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+            updateUI();
+        }
+
+        // Mettre à jour l'UI selon l'état de connexion
+        function updateUI() {
+            const userInfo = document.getElementById('userInfo');
+            const authSection = document.getElementById('authSection');
+            
+            if (currentSession) {
+                userInfo.classList.remove('hidden');
+                document.getElementById('currentUsername').textContent = currentSession.username;
+                document.getElementById('currentName').textContent = currentSession.name;
+                authSection.style.display = 'none';
+            } else {
+                userInfo.classList.add('hidden');
+                authSection.style.display = 'block';
+            }
+        }
+
+        // Déconnexion
+        function logout() {
+            currentSession = null;
+            localStorage.removeItem(SESSION_KEY);
+            updateUI();
+            loadProfiles();
+        }
+
+        // Formulaire d'inscription
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const messageDiv = document.getElementById('authMessage');
+            messageDiv.innerHTML = '';
+
+            const formData = {
+                username: document.getElementById('regUsername').value,
+                password: document.getElementById('regPassword').value,
+                name: document.getElementById('regName').value,
+                age: parseInt(document.getElementById('regAge').value),
+                bio: document.getElementById('regBio').value || undefined,
+                interests: document.getElementById('regInterests').value
+                    ? document.getElementById('regInterests').value.split(',').map(i => i.trim()).filter(i => i)
+                    : undefined
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Erreur lors de l\'inscription');
+                }
+
+                const session = await response.json();
+                saveSession(session);
+                messageDiv.innerHTML = `<div class="success">✅ Profil créé avec succès ! Bienvenue ${session.name} !</div>`;
+                document.getElementById('registerForm').reset();
+                loadProfiles();
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+            }
+        });
+
+        // Formulaire de connexion
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const messageDiv = document.getElementById('loginMessage');
+            messageDiv.innerHTML = '';
+
+            const formData = {
+                username: document.getElementById('loginUsername').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Erreur lors de la connexion');
+                }
+
+                const session = await response.json();
+                saveSession(session);
+                messageDiv.innerHTML = `<div class="success">✅ Connexion réussie ! Bienvenue ${session.name} !</div>`;
+                document.getElementById('loginForm').reset();
+                loadProfiles();
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+            }
+        });
+
+        // Charger tous les profils
+        async function loadProfiles() {
+            const container = document.getElementById('profilesContainer');
+            container.innerHTML = '<div class="loading">Chargement des profils...</div>';
+
+            try {
+                const headers = {};
+                if (currentSession) {
+                    headers['X-User-Id'] = currentSession.profileId.toString();
+                }
+
+                const response = await fetch(`${API_BASE}/profiles`, {
+                    headers: headers
+                });
+                if (!response.ok) {
+                    throw new Error('Erreur lors du chargement');
+                }
+
+                const profiles = await response.json();
+                
+                if (profiles.length === 0) {
+                    container.innerHTML = '<div class="loading">Aucun profil disponible. Créez-en un !</div>';
+                    return;
+                }
+
+                container.innerHTML = '<div class="profiles-grid"></div>';
+                const grid = container.querySelector('.profiles-grid');
+
+                profiles.forEach(profile => {
+                    const isOwnProfile = currentSession && profile.id === currentSession.profileId;
+                    const isLiked = profile.isLiked || false;
+                    const card = document.createElement('div');
+                    card.className = 'profile-card';
+                    card.setAttribute('data-profile-id', profile.id);
+                    card.innerHTML = `
+                        <div class="profile-header">
+                            <div>
+                                <div class="profile-name">${escapeHtml(profile.name)}</div>
+                                <div class="profile-username">@${escapeHtml(profile.username)}</div>
+                                <div class="profile-age">${profile.age} ans</div>
+                            </div>
+                        </div>
+                        ${profile.bio ? `<div class="profile-bio">${escapeHtml(profile.bio)}</div>` : ''}
+                        ${profile.interests && profile.interests.length > 0 ? `
+                            <div class="profile-interests">
+                                ${profile.interests.map(i => `<span class="interest-tag">${escapeHtml(i)}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        <div class="profile-footer">
+                            <div class="likes-count" data-likes="${profile.id}">❤️ ${profile.likes || 0}</div>
+                            ${isOwnProfile 
+                                ? '<button class="like-btn" disabled>Votre profil</button>'
+                                : isLiked
+                                ? '<button class="like-btn" disabled style="background: #9e9e9e; cursor: not-allowed;">Déjà liké ✓</button>'
+                                : `<button class="like-btn" data-like-btn="${profile.id}" onclick="likeProfile(${profile.id}, this)" ${!currentSession ? 'disabled' : ''}>Like</button>`
+                            }
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                container.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+            }
+        }
+
+        // Fonction pour afficher une notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.style.display = 'block';
+            notification.innerHTML = `
+                <div class="notification-content notification-${type}">
+                    <span>${type === 'success' ? '✅' : '❌'} ${escapeHtml(message)}</span>
+                    <span class="notification-close" onclick="this.parentElement.parentElement.style.display='none'">×</span>
+                </div>
+            `;
+            
+            // Auto-fermer après 5 secondes
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
+
+        // Fonction pour liker un profil (mise à jour fluide)
+        async function likeProfile(id, buttonElement) {
+            if (!currentSession) {
+                showNotification('Vous devez être connecté pour liker un profil', 'error');
+                return;
+            }
+
+            // Désactiver le bouton pendant la requête
+            if (buttonElement) {
+                buttonElement.disabled = true;
+                buttonElement.textContent = '...';
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/profiles/${id}/like`, {
+                    method: 'POST',
+                    headers: {
+                        'X-User-Id': currentSession.profileId.toString()
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Erreur lors du like');
+                }
+
+                const updatedProfile = await response.json();
+                
+                // Mise à jour fluide : seulement le compteur et le bouton
+                const likesElement = document.querySelector(`[data-likes="${id}"]`);
+                if (likesElement) {
+                    likesElement.textContent = `❤️ ${updatedProfile.likes || 0}`;
+                }
+
+                // Désactiver le bouton définitivement après un like réussi
+                if (buttonElement) {
+                    buttonElement.disabled = true;
+                    buttonElement.textContent = 'Déjà liké ✓';
+                    buttonElement.style.background = '#9e9e9e';
+                    buttonElement.style.cursor = 'not-allowed';
+                }
+
+                showNotification(`Vous avez liké ${updatedProfile.name} !`, 'success');
+                
+                // Pas besoin de recharger : on a déjà mis à jour le compteur et le bouton
+                // loadProfiles() causerait un flash blanc/noir inutile
+            } catch (error) {
+                // Réactiver le bouton en cas d'erreur
+                if (buttonElement) {
+                    buttonElement.disabled = false;
+                    buttonElement.textContent = 'Like';
+                }
+                showNotification(error.message, 'error');
+            }
+        }
+
+        // Fonction pour échapper le HTML (sécurité)
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
