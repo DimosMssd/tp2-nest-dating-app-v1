@@ -25,7 +25,7 @@
 
 ---
 
-## 1. Comprendre le squelette (5 min)
+## 1. Comprendre le squelette
 
 ```
 src/
@@ -170,5 +170,5 @@ Après avoir implémenté la méthode, testez sur `http://localhost:3000` :
    - Après un like réussi, le compteur se met à jour et le bouton devient “Déjà liké ✓”
 ---
 
-Bon TP ✨ et amusez-vous avec NestJS !
+Bon TP !
 
