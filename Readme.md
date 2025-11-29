@@ -12,16 +12,28 @@
    ```bash
    npm install
    ```
-2. **Supabase déjà configuré**
+2. **Configuration Supabase**
+   - Créez un fichier `.env` à la racine du dossier `nest-dating-app/` avec les variables suivantes :
+   ```env
+   SUPABASE_URL=https://ztumygezvfeecphkeeil.supabase.co
+   SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0dW15Z2V6dmZlZWNwaGtlZWlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0Mjk2MjMsImV4cCI6MjA3OTAwNTYyM30.yrheo7fC3vI0OF5GdV3bLhcd4rrlpV9yIbzh_0eGOcw
+   ```
+   > ⚠️ **Note de sécurité** : Cette clé est une clé `anon` (anonyme) conçue pour être utilisée côté client. Elle est protégée par les politiques de sécurité Supabase (RLS).
+3. **Supabase déjà configuré**
    - Les tables `profiles` et `likes` sont fournies.
    - Les requêtes SQL ont déjà été exécutées (pas besoin de les refaire).
-3. **Frontend inclus**
+4. **Frontend inclus**
    - Disponible sur `http://localhost:3000`
    - Gère inscription, connexion, affichage des profils et boutons “Like”.
-4. **Helpers déjà fournis**
+5. **Helpers déjà fournis**
    - Ce sont des méthodes privées dans les services NestJS
    - Elles encapsulent les appels Supabase et la logique technique
    - Votre mission : orchestrer ces helpers via les méthodes publiques (controllers/services)
+6. **Vérification de l'installation**
+   - Lancez l'application avec `npm run start:dev` dans le dossier `nest-dating-app/`
+   - Ouvrez votre navigateur sur `http://localhost:3000`
+   - Vous devriez voir l'interface avec les formulaires d'inscription/connexion et la section des profils
+   - ⚠️ **C'est normal que rien ne fonctionne pour l'instant** : les endpoints sont à implémenter dans les étapes suivantes. Si vous voyez l'interface, c'est que tout est bien configuré !
 
 ---
 
